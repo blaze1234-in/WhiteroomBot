@@ -1,8 +1,8 @@
 import logging
 import asyncio
+import os
 from telegram import Update, ChatPermissions
 from telegram.ext import Application, CommandHandler, filters, CallbackContext
-import os
 
 # Logging setup
 logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
@@ -11,13 +11,9 @@ logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=lo
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 ADMIN_IDS = os.getenv("ADMIN_IDS", "").strip()
+ADMIN_IDS = list(map(int, ADMIN_IDS.split(","))) if ADMIN_IDS else []
 
-if ADMIN_IDS:
-    ADMIN_IDS = list(map(int, ADMIN_IDS.split(",")))
-else:
-    ADMIN_IDS = []  # Agar empty ho toh empty list bana do
-
-print("Loaded Admin IDs:", ADMIN_IDS)  # Debugging ke liye (baad me hata sakte ho)
+print("Loaded Admin IDs:", ADMIN_IDS)  # Debugging ke liye
 
 # Initialize bot
 app = Application.builder().token(BOT_TOKEN).build()
@@ -87,5 +83,14 @@ if __name__ == "__main__":
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    asyncio.run(main())  # Proper event loop handling
+    loop = asyncio.get_event_loop()
+
+    try:
+        loop.run_until_complete(main())  # Event loop ko properly handle kiya
+    except KeyboardInterrupt:
+        print("Bot stopped manually.")
+    finally:
+        loop.stop()
+        loop.close()
+
 
