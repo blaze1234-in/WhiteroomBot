@@ -92,3 +92,7 @@ if __name__ == "__main__":
         loop.run_until_complete(main())
     except RuntimeError:
         print("Event loop is already running. Skipping new loop creation.")
+    finally:
+        if 'app' in globals():
+            loop.run_until_complete(app.shutdown())  # Properly shut down the bot
+            loop.close()
