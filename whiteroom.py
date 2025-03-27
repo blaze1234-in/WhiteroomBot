@@ -90,6 +90,9 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())  # Properly start the bot
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(main())  
     except RuntimeError as e:
         print(f"Error: {e}")
+    finally:
+        loop.close()  # Ensure loop is closed properly
