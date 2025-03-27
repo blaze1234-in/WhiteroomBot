@@ -1,13 +1,22 @@
 import asyncio
-import sys
-from telegram.ext import Application
+from telegram import Update
+from telegram.ext import Application, CommandHandler
 
-app = Application.builder().token("7932045647:AAFaZhRxrbagNuwXDrzY_FUhu1VFWv9nFrc").build()
+async def start(update: Update, context):
+    await update.message.reply_text("Hello! I'm WhiteroomBot.")
 
-async def main():
-    await app.run_polling()
+def main():
+    app = Application.builder().token("YOUR_BOT_TOKEN").build()
+    app.add_handler(CommandHandler("start", start))
+
+    print("Bot is running...")
+
+    try:
+        app.run_polling()
+    except RuntimeError as e:
+        if "Cannot close a running event loop" in str(e):
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(app.stop())
 
 if __name__ == "__main__":
-    if sys.platform == "win32":
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())  # Windows ke liye fix
-    asyncio.run(main())  # Proper event loop handling
+    main()
