@@ -85,14 +85,11 @@ async def main():
 
 import asyncio
 
+async def main():
+    await app.run_polling()
+
 if __name__ == "__main__":
     try:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(main())
-    except RuntimeError:
-        print("Event loop is already running. Skipping new loop creation.")
-    finally:
-        if 'app' in globals():
-            loop.run_until_complete(app.shutdown())  # Properly shut down the bot
-            loop.close()
+        asyncio.run(main())  # Properly start the bot
+    except RuntimeError as e:
+        print(f"Error: {e}")
