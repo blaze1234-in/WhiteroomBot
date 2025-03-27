@@ -6,7 +6,7 @@ async def start(update: Update, context):
     await update.message.reply_text("Hello! I'm WhiteroomBot.")
 
 def main():
-    app = Application.builder().token("YOUR_BOT_TOKEN").build()
+    app = Application.builder().token("7932045647:AAFaZhRxrbagNuwXDrzY_FUhu1VFWv9nFrc").build()
     app.add_handler(CommandHandler("start", start))
 
     print("Bot is running...")
