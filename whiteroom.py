@@ -83,4 +83,8 @@ app.add_handler(CommandHandler("ban", ban, filters.REPLY))
 async def main():
     await app.run_polling()
 
-asyncio.run(main())
+import asyncio
+
+if __name__ == "__main__":
+    asyncio.run(main(), debug=True)
+
