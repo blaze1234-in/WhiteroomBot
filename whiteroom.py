@@ -9,17 +9,15 @@ logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=lo
 
 # Bot Token & Admin IDs (from Railway Environment Variables)
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-import os
 
 ADMIN_IDS = os.getenv("ADMIN_IDS", "").strip()
 
-if ADMIN_IDS:  
-    ADMIN_IDS = list(map(int, ADMIN_IDS.split(",")))  
-else:  
+if ADMIN_IDS:
+    ADMIN_IDS = list(map(int, ADMIN_IDS.split(",")))
+else:
     ADMIN_IDS = []  # Agar empty ho toh empty list bana do
 
 print("Loaded Admin IDs:", ADMIN_IDS)  # Debugging ke liye (baad me hata sakte ho)
-
 
 # Initialize bot
 app = Application.builder().token(BOT_TOKEN).build()
@@ -83,22 +81,11 @@ app.add_handler(CommandHandler("ban", ban, filters.REPLY))
 async def main():
     await app.run_polling()
 
-import asyncio
-
-async def main():
-    await app.run_polling()
-
 if __name__ == "__main__":
     import sys
-    import platform
 
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    try:
-        loop = asyncio.get_running_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
+    asyncio.run(main())  # Proper event loop handling
 
-    loop.run_until_complete(main())
