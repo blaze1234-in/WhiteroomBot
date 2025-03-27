@@ -90,6 +90,10 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())  # Properly start and manage event loop
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            asyncio.ensure_future(main())  # Already running loop me task add karo
+        else:
+            loop.run_until_complete(main())  # Normal case me run karo
     except RuntimeError as e:
         print(f"Error: {e}")
