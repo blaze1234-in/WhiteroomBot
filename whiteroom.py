@@ -9,7 +9,17 @@ logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=lo
 
 # Bot Token & Admin IDs (from Railway Environment Variables)
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_IDS = list(map(int, os.getenv("ADMIN_IDS", "").split(",")))  # List of admin IDs
+import os
+
+ADMIN_IDS = os.getenv("ADMIN_IDS", "").strip()
+
+if ADMIN_IDS:  
+    ADMIN_IDS = list(map(int, ADMIN_IDS.split(",")))  
+else:  
+    ADMIN_IDS = []  # Agar empty ho toh empty list bana do
+
+print("Loaded Admin IDs:", ADMIN_IDS)  # Debugging ke liye (baad me hata sakte ho)
+
 
 # Initialize bot
 app = Application.builder().token(BOT_TOKEN).build()
