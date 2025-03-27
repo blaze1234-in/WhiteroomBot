@@ -90,10 +90,9 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        loop = asyncio.new_event_loop()  # Naya event loop banao
-        asyncio.set_event_loop(loop)  # Usko set karo
-        loop.run_until_complete(main())  # Run karo
-    except RuntimeError as e:
-        print(f"Error: {e}")
-    finally:
-        loop.close()  # Safe closing
+        loop = asyncio.get_event_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    loop.run_until_complete(main())
