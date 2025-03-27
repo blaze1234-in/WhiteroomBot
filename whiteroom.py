@@ -90,8 +90,14 @@ async def main():
 
 if __name__ == "__main__":
     import sys
+    import platform
 
-    if sys.platform == "win32":
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    if platform.system() != "Windows":  
+        try:
+            asyncio.get_running_loop()
+        except RuntimeError:
+            pass  # No event loop running
+        else:
+            asyncio.set_event_loop(asyncio.new_event_loop())
 
     asyncio.run(main())
