@@ -1,22 +1,76 @@
+import logging
 import asyncio
-from telegram import Update
-from telegram.ext import Application, CommandHandler
+from telegram import Update, ChatPermissions
+from telegram.ext import Application, CommandHandler, filters, CallbackContext
+import os
 
-async def start(update: Update, context):
-    await update.message.reply_text("Hello! I'm WhiteroomBot.")
+# Logging setup
+logging.basicConfig(format="%(asctime)s - %(levelname)s - %(message)s", level=logging.INFO)
 
-def main():
-    app = Application.builder().token("7932045647:AAFaZhRxrbagNuwXDrzY_FUhu1VFWv9nFrc").build()
-    app.add_handler(CommandHandler("start", start))
+# Bot Token & Admin IDs (from Railway Environment Variables)
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_IDS = list(map(int, os.getenv("ADMIN_IDS", "").split(",")))  # List of admin IDs
 
-    print("Bot is running...")
+# Initialize bot
+app = Application.builder().token(BOT_TOKEN).build()
 
-    try:
-        app.run_polling()
-    except RuntimeError as e:
-        if "Cannot close a running event loop" in str(e):
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(app.stop())
+# Warn storage
+warns = {}
 
-if __name__ == "__main__":
-    main()
+# Command to warn users
+async def warn(update: Update, context: CallbackContext):
+    if update.message.from_user.id not in ADMIN_IDS:
+        return
+    
+    if not context.args:
+        await update.message.reply_text("Usage: /warn @user reason")
+        return
+
+    user = update.message.reply_to_message.from_user
+    reason = " ".join(context.args)
+    
+    warns[user.id] = warns.get(user.id, 0) + 1
+    await update.message.reply_text(f"{user.first_name} has been warned! Reason: {reason} (Total Warns: {warns[user.id]})")
+
+    if warns[user.id] >= 3:
+        await update.effective_chat.ban_member(user.id)
+        await update.message.reply_text(f"{user.first_name} has been banned for exceeding warn limit!")
+
+# Command to mute users
+async def mute(update: Update, context: CallbackContext):
+    if update.message.from_user.id not in ADMIN_IDS:
+        return
+
+    user = update.message.reply_to_message.from_user
+    await update.effective_chat.restrict_member(user.id, ChatPermissions(can_send_messages=False))
+    await update.message.reply_text(f"{user.first_name} has been muted!")
+
+# Command to unmute users
+async def unmute(update: Update, context: CallbackContext):
+    if update.message.from_user.id not in ADMIN_IDS:
+        return
+
+    user = update.message.reply_to_message.from_user
+    await update.effective_chat.restrict_member(user.id, ChatPermissions(can_send_messages=True))
+    await update.message.reply_text(f"{user.first_name} has been unmuted!")
+
+# Command to ban users
+async def ban(update: Update, context: CallbackContext):
+    if update.message.from_user.id not in ADMIN_IDS:
+        return
+
+    user = update.message.reply_to_message.from_user
+    await update.effective_chat.ban_member(user.id)
+    await update.message.reply_text(f"{user.first_name} has been banned!")
+
+# Add command handlers
+app.add_handler(CommandHandler("warn", warn, filters.REPLY))
+app.add_handler(CommandHandler("mute", mute, filters.REPLY))
+app.add_handler(CommandHandler("unmute", unmute, filters.REPLY))
+app.add_handler(CommandHandler("ban", ban, filters.REPLY))
+
+# Start bot
+async def main():
+    await app.run_polling()
+
+asyncio.run(main())
