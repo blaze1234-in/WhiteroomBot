@@ -73,24 +73,19 @@ app.add_handler(CommandHandler("mute", mute, filters.REPLY))
 app.add_handler(CommandHandler("unmute", unmute, filters.REPLY))
 app.add_handler(CommandHandler("ban", ban, filters.REPLY))
 
-# Start bot
+# Start bot (Proper Railway Event Loop Handling)
 async def main():
+    print("Bot is running...")
     await app.run_polling()
 
+# 🚀 Run without event loop issues!
 if __name__ == "__main__":
-    import sys
-
-    if sys.platform == "win32":
-        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-    loop = asyncio.get_event_loop()
-
     try:
-        loop.run_until_complete(main())  # Event loop ko properly handle kiya
-    except KeyboardInterrupt:
-        print("Bot stopped manually.")
-    finally:
-        loop.stop()
-        loop.close()
+        asyncio.run(main())  # Only use asyncio.run() directly (Safe method)
+    except RuntimeError:
+        loop = asyncio.get_event_loop()
+        loop.create_task(main())
+        loop.run_forever()
+
 
 
