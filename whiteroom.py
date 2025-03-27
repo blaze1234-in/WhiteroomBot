@@ -90,10 +90,10 @@ async def main():
 
 if __name__ == "__main__":
     try:
-        loop = asyncio.new_event_loop()  # Naya event loop create karo
-        asyncio.set_event_loop(loop)
-        loop.run_until_complete(main())  # Main function run karo
+        if not asyncio.get_event_loop().is_running():
+            asyncio.run(main())  # Agar event loop chal raha hai toh run karo
+        else:
+            loop = asyncio.get_event_loop()
+            loop.create_task(main())  # Running event loop me task add karo
     except RuntimeError as e:
         print(f"Error: {e}")
-    finally:
-        loop.close()  # Safe close
