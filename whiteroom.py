@@ -73,19 +73,22 @@ app.add_handler(CommandHandler("mute", mute, filters.REPLY))
 app.add_handler(CommandHandler("unmute", unmute, filters.REPLY))
 app.add_handler(CommandHandler("ban", ban, filters.REPLY))
 
-# Start bot (Proper Railway Event Loop Handling)
+# Start bot (Railway & Async Safe)
 async def main():
     print("Bot is running...")
     await app.run_polling()
 
-# 🚀 Run without event loop issues!
+# ✅ Final Fix (No `asyncio.run()`)
 if __name__ == "__main__":
     try:
-        asyncio.run(main())  # Only use asyncio.run() directly (Safe method)
+        loop = asyncio.get_running_loop()
     except RuntimeError:
-        loop = asyncio.get_event_loop()
-        loop.create_task(main())
-        loop.run_forever()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    loop.create_task(main())  # Non-blocking task
+    loop.run_forever()  # Keeps the bot running
+
 
 
 
