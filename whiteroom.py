@@ -2,7 +2,7 @@ import asyncio
 import sys
 from telegram.ext import Application
 
-app = Application.builder().token("YOUR_BOT_TOKEN").build()
+app = Application.builder().token("7932045647:AAFaZhRxrbagNuwXDrzY_FUhu1VFWv9nFrc").build()
 
 async def main():
     await app.run_polling()
