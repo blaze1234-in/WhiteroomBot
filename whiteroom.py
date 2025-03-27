@@ -92,12 +92,13 @@ if __name__ == "__main__":
     import sys
     import platform
 
-    if platform.system() != "Windows":  
-        try:
-            asyncio.get_running_loop()
-        except RuntimeError:
-            pass  # No event loop running
-        else:
-            asyncio.set_event_loop(asyncio.new_event_loop())
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    asyncio.run(main())
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    loop.run_until_complete(main())
